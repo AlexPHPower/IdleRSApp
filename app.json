@@ -1,17 +1,26 @@
 {
   "expo": {
     "name": "IdleRSApp",
-    "slug": "IdleRSApp",
+    "slug": "idlers",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "idlersapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.odyx.idlersapp",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0"]
+          }
+        ]
+      }
     },
     "android": {
+      "package": "com.odyx.idlersapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -32,10 +41,25 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "027a2961-b6f1-4772-afec-dabc998e1a03"
+      }
+    },
+    "owner": "bearhug"
   }
 }
