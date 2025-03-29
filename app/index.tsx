@@ -1,70 +1,56 @@
 "use client"
 
-import {useState, useEffect} from "react"
-import {StyleSheet, View, Text, ActivityIndicator} from "react-native"
-import {Button} from "@rneui/themed";
+import { useEffect, useState } from "react"
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native"
+import { Button } from "@rneui/themed"
 import * as Google from "expo-auth-session/providers/google"
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useRouter } from "expo-router"
 
 export default function AuthScreen() {
     const [loading, setLoading] = useState(false)
-    const [userInfo, setUserInfo] = useState(null);
+    const router = useRouter()
 
-    const getUserInfo = async (token: string) => {
-        if (!token) return;
-        try {
-            const response = await fetch(
-                "https://www.googleapis.com/userinfo/v2/me",
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            const user = await response.json();
-            await AsyncStorage.setItem("user", JSON.stringify(user));
-            setUserInfo(user);
-        } catch (error) {
-            console.error(
-                "Failed to fetch user data:"
-            );
-        }
-    };
+    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+        clientId: "521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0.apps.googleusercontent.com",
+    })
 
-    const signInWithGoogle = async () => {
-        try {
-            // Attempt to retrieve user information from AsyncStorage
-            const userJSON = await AsyncStorage.getItem("user");
-
-            if (userJSON) {
-                setUserInfo(JSON.parse(userJSON));
-            } else if (response?.type === "success") {
-
-                if (!response.authentication) return;
-                getUserInfo(response.authentication.accessToken);
-            }
-        } catch (error) {
-            // Handle any errors that occur during AsyncStorage retrieval or other operations
-            console.error("Error retrieving user data from AsyncStorage:", error);
-        }
-    };
-
+    // Handle Google Login response
     useEffect(() => {
-        signInWithGoogle().then(r => console.log(r));
-    }, []);
+        const handleGoogleLogin = async () => {
+            if (response?.type === "success") {
+                const idToken = response.params.id_token
+                if (!idToken) {
+                    Alert.alert("Login Error", "No ID token received.")
+                    return
+                }
 
-    console.log('User info: ', JSON.stringify(userInfo))
+                try {
+                    setLoading(true)
+                    const res = await fetch("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken)
+                    const user = await res.json()
 
-    const config = {
-        iosClientId: "521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0.apps.googleusercontent.com",
-        webClientId: "521074272897-2er9bunhf7atdtqr1aj6ftjqn0cq7i7b.apps.googleusercontent.com",
-    };
+                    await AsyncStorage.setItem("user", JSON.stringify(user))
+                    console.log("User info saved:", user)
 
-    const [request, response, promptAsync] = Google.useAuthRequest(config);
+                    router.replace("/home")
+                } catch (err) {
+                    Alert.alert("Login Failed", "Unable to authenticate user.")
+                    console.error("Google login error:", err)
+                } finally {
+                    setLoading(false)
+                }
+            }
+        }
+
+        handleGoogleLogin()
+    }, [response])
 
     return (
         <View style={styles.container}>
             {loading && (
                 <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color="#F59E0B"/>
+                    <ActivityIndicator size="large" color="#F59E0B" />
                 </View>
             )}
 
@@ -133,7 +119,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 20,
         shadowColor: "#000",
-        shadowOffset: {width: 0, height: 4},
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
@@ -154,11 +140,6 @@ const styles = StyleSheet.create({
     googleButtonText: {
         color: "#1F2937",
         fontWeight: "600",
-    },
-    appleButton: {
-        height: 50,
-        width: "100%",
-        marginBottom: 16,
     },
     termsText: {
         fontSize: 12,

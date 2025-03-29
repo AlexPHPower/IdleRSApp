@@ -14,9 +14,17 @@
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["com.googleusercontent.apps.521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0"]
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0"
+            ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.521074272897-9mdpp3a3ruf19sdkoubbuhbdsa3dvcd0"
+            ]
           }
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
